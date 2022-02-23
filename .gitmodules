@@ -1,0 +1,3 @@
+[submodule "Data/CoinLegsSignalBacktesterData"]
+	path = Data/CoinLegsSignalBacktesterData
+	url = https://github.com/Lu05/CoinLegsSignalBacktesterData
