@@ -26,7 +26,8 @@ The max loss is the difference between the entry price and the lowest price(in c
 There is also a -p option for plotting the results. This option will save an html file for each signal which will be saved at a plot folder. This folder will be created at the current directory.
 </br>
 Here is an example of a plot:
----placeholder---
+![image](https://user-images.githubusercontent.com/3795343/155398422-4b6de26e-113b-4605-a7f7-35ea2cfda911.png)
+
 
 The colors are
 
