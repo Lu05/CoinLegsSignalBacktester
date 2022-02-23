@@ -1,0 +1,13 @@
+*.pdb
+.vs/
+bin
+obj
+*.csproj*.cache
+*.g.cs
+*_wpftmp
+*.user
+*.~*
+*.bak
+*.log
+
+/config.json

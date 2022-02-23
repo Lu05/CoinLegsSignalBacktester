@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "CoinLegsSignalBacktester": {
+      "commandName": "Project"
+    }
+  }
+}

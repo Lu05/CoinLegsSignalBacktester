@@ -1,0 +1,151 @@
+{
+    "DataPath": "PATH_TO_DATA",
+    "StrategyToUse": "MarketPlaceTrailingStopLossStrategy",
+    "BacktestConfigs": [
+        {
+            "StrategyName": "MarketPlaceFixedTakeProfitStrategy",
+            "Parameters": [
+                {
+                    "Key": "UseStopLoss",
+                    "Value": true
+                },
+                {
+                    "Key": "StopLoss",
+                    "Value": 0.08
+                },
+                {
+                    "Key": "TakeProfit",
+                    "Value": 0.08
+                },
+                {
+                    "Key": "MarketBuy",
+                    "Value": true
+                },
+                {
+                    "Key": "TakeProfitIndex",
+                    "Value": 5
+                },
+                {
+                    "Key": "UseStopLossFromSignal",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "StrategyName": "BlackFishMoveTakeProfitM2Strategy",
+            "Parameters": [
+                {
+                    "Key": "UseStopLoss",
+                    "Value": true
+                },
+                {
+                    "Key": "MarketBuy",
+                    "Value": true
+                },
+                {
+                    "Key": "StopLoss",
+                    "Value": 0.08
+                },
+                {
+                    "Key": "TakeProfit",
+                    "Value": 0.08
+                }
+            ]
+        },
+        {
+            "StrategyName": "MarketPlaceTrailingStopLossStrategy",
+            "Parameters": [
+                {
+                    "Key": "UseStopLoss",
+                    "Value": true
+                },
+                {
+                    "Key": "StopLoss",
+                    "Value": 0.08
+                },
+                {
+                    "Key": "TakeProfit",
+                    "Value": 0.06992612906977207
+                },
+                {
+                    "Key": "MarketBuy",
+                    "Value": true
+                },
+                {
+                    "Key": "TrailingOffset",
+                    "Value": 0.019842265592981634
+                },
+                {
+                    "Key": "TrailingStartOffset",
+                    "Value": 0.020306292442264912
+                },
+                {
+                    "Key": "UseStopLossFromSignal",
+                    "Value": true
+                }
+            ]
+        }
+    ],
+    "OptimizationtConfigs": [
+        {
+            "StrategyName": "MarketPlaceFixedTakeProfitStrategy",
+            "BacktestParameters": [
+                {
+                    "Key": "MarketBuy",
+                    "Value": false
+                },
+                {
+                    "Key": "UseStopLoss",
+                    "Value": true
+                }
+            ],
+            "OptimizationParameters": [
+                {
+                    "Key": "TakeProfit",
+                    "Min": 0.001,
+                    "Max": 0.1
+                },
+                {
+                    "Key": "StopLoss",
+                    "Min": 0.001,
+                    "Max": 0.1
+                }
+            ]
+        },
+        {
+            "StrategyName": "MarketPlaceTrailingStopLossStrategy",
+            "BacktestParameters": [
+                {
+                    "Key": "MarketBuy",
+                    "Value": false
+                },
+                {
+                    "Key": "UseStopLoss",
+                    "Value": true
+                }
+            ],
+            "OptimizationParameters": [
+                {
+                    "Key": "TakeProfit",
+                    "Min": 0.001,
+                    "Max": 0.3
+                },
+                {
+                    "Key": "StopLoss",
+                    "Min": 0.001,
+                    "Max": 0.03
+                },
+                {
+                    "Key": "TrailingOffset",
+                    "Min": 0.001,
+                    "Max": 0.02
+                },
+                {
+                    "Key": "TrailingStartOffset",
+                    "Min": 0.001,
+                    "Max": 0.03
+                }
+            ]
+        }
+    ]
+}
