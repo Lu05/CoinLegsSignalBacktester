@@ -1,4 +1,9 @@
 # CoinLegsSignalBacktester
+
+**IMPORTANT**: This software is free of use and YOU and nobody else will be responsible for anything that is executed!
+Also this has nothing to do with the official coinlegs team. It is my private work.
+</br>
+</br>
 This application is for backtesting the recorded data of the coinlegs signals.
 </br>
 The data can be downloaded here
