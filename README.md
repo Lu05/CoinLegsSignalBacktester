@@ -27,7 +27,7 @@ This command will backtest all data at the folder defined at the config file.
 Each result will be printed at the console with the specific profit and also the max loss for this trade.
 The max loss is the difference between the entry price and the lowest price(in case of long) between entry and exit.
 </br>
-</br>
+#### plot
 There is also a -p option for plotting the results. This option will save an html file for each signal which will be saved at a plot folder. This folder will be created at the current directory.
 </br>
 Here is an example of a plot:
@@ -45,6 +45,11 @@ grey | all the targets and SL from the signal
 yellow | entry and exit
 
 This is also really helpfull for visual debugging a strategy.
+
+</br>
+</br>
+The **-d** option will backtest or optimize only for the last x days starting from the time te program will run. 
+
 ### optimize
 This command will try to find the best parameters for the current strategy to maximize the profit. It will also test all the data from the folder at the config.</br>
 It will run parallel and so it can be a bit CPU consuming and it will not stop at any point. To cancel it you can press Ctrl+C or simply exit the program. But don't forget to write down the parameters before exiting.
