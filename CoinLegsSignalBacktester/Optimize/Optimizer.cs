@@ -9,7 +9,7 @@ internal class Optimizer
 {
     private bool _run;
 
-    public void Run(IEnumerable<BacktestData> data, Config config)
+    public void Run(IEnumerable<BacktestData> data, Config config, OptimizationTarget target)
     {
         _run = true;
 
@@ -22,6 +22,7 @@ internal class Optimizer
 
         var lockObj = new object();
         decimal maxProfit = 0;
+        int maxWins = 0;
         BacktestConfig bestConfig;
         Parallel.ForEach(Infinite(), _ =>
         {
@@ -48,30 +49,50 @@ internal class Optimizer
                 });
             }
 
-            var result = Backtest(strategy, data, btConfig);
+            var backtestDataArray = data.ToArray();
+            var result = Backtest(strategy, backtestDataArray, btConfig);
             lock (lockObj)
             {
-                if (result > maxProfit)
+                if (target == OptimizationTarget.Profit)
                 {
-                    maxProfit = result;
-                    bestConfig = btConfig;
-                    Console.WriteLine($"==> {Math.Round(maxProfit * 100, 3)}%");
-                    Console.WriteLine(JsonConvert.SerializeObject(bestConfig, Formatting.Indented));
+                    if (result.Item1 > maxProfit)
+                    {
+                        maxProfit = result.Item1;
+                        bestConfig = btConfig;
+                        Console.WriteLine($"==> {Math.Round(maxProfit * 100, 3)}%");
+                        Console.WriteLine(JsonConvert.SerializeObject(bestConfig, Formatting.Indented));
+                    }
+                }
+                else if (target == OptimizationTarget.Wins)
+                {
+                    if (result.Item2 >= maxWins && result.Item1 > maxProfit)
+                    {
+                        maxWins = result.Item2;
+                        maxProfit = result.Item1;
+                        bestConfig = btConfig;
+                        Console.WriteLine($"==> wins {maxWins}/{backtestDataArray.Length} ==> profit {Math.Round(result.Item1 * 100, 3)}%");
+                        Console.WriteLine(JsonConvert.SerializeObject(bestConfig, Formatting.Indented));
+                    }
                 }
             }
         });
     }
 
-    private decimal Backtest(StrategyBase strategy, IEnumerable<BacktestData> data, BacktestConfig config)
+    private Tuple<decimal, int> Backtest(StrategyBase strategy, IEnumerable<BacktestData> data, BacktestConfig config)
     {
         decimal profit = 0;
+        int wins = 0;
         foreach (var backtestData in data)
         {
             var result = strategy.Backtest(backtestData, config);
             profit += result.PnL;
+            if (profit > 0)
+            {
+                wins++;
+            }
         }
 
-        return profit;
+        return new Tuple<decimal, int>(profit, wins);
     }
 
     private IEnumerable<bool> Infinite()

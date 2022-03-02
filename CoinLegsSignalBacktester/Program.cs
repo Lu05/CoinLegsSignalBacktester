@@ -16,6 +16,7 @@ public class Program
         var configArg = new Option<string>(new[] { "-c", "--config" }, () => string.Empty, "the path to the config file");
         var plotOption = new Option<bool>(new[] { "-p", "--plot" }, () => false, "plot html files for each backtest");
         var daysOption = new Option<int>(new[] { "-d", "--days" }, () => int.MaxValue, "max days (now - days) uses for backtest/optimize");
+        var optimizeTargetOption = new Option<string>(new[] { "-t", "--target" }, () => "profit", "target for optimization (profit, wins)");
 
         var root = new RootCommand();
 
@@ -27,15 +28,24 @@ public class Program
         };
         root.Add(backtestCommand);
 
-        backtestCommand.SetHandler((string configPath, bool plot, int days) => { ExecuteBacktest(configPath, plot, days); }, configArg, plotOption, daysOption);
+        backtestCommand.SetHandler((string configPath, bool plot, int days) =>
+            {
+                ExecuteBacktest(configPath, plot, days);
+            }
+            , configArg, plotOption, daysOption);
 
         var optimizeCommand = new Command("optimize")
         {
             configArg,
-            daysOption
+            daysOption,
+            optimizeTargetOption
         };
         root.Add(optimizeCommand);
-        optimizeCommand.SetHandler((string configPath, int days) => { ExecuteOptimize(configPath, days); }, configArg, daysOption);
+        optimizeCommand.SetHandler((string configPath, int days, string target) =>
+            {
+                ExecuteOptimize(configPath, days, target);
+            }
+            , configArg, daysOption, optimizeTargetOption);
 
         if (args.Length == 0)
             root.Invoke("-h");
@@ -52,13 +62,18 @@ public class Program
         }
     }
 
-    private static void ExecuteOptimize(string configPath, int days)
+    private static void ExecuteOptimize(string configPath, int days, string target)
     {
         var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
         if (config != null)
         {
+            var optimizeTarget = OptimizationTarget.Profit;
+            if (target == "wins")
+            {
+                optimizeTarget = OptimizationTarget.Wins;
+            }
             var data = LoadData(config.DataPath, days);
-            Optimizer.Run(data, config);
+            Optimizer.Run(data, config, optimizeTarget);
         }
     }
 

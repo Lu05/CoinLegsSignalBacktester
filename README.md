@@ -48,11 +48,14 @@ This is also really helpfull for visual debugging a strategy.
 
 </br>
 </br>
+
 The **-d** option will backtest or optimize only for the last x days starting from the time te program will run. 
 
 ### optimize
 This command will try to find the best parameters for the current strategy to maximize the profit. It will also test all the data from the folder at the config.</br>
 It will run parallel and so it can be a bit CPU consuming and it will not stop at any point. To cancel it you can press Ctrl+C or simply exit the program. But don't forget to write down the parameters before exiting.
+
+With **-t** option you can specify the optimization target. **wins** means it is will optimize for the highest win rate. **profit** means it will optimize for the highest profit. 
 ### config
 The config file is the most important thing for both of the parameters.
 There is a file called config.example.json at the root of this repository wich all available parameters. The parameters will be explained in detail below.
