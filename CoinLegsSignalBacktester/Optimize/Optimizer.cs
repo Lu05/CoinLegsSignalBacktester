@@ -86,7 +86,7 @@ internal class Optimizer
         {
             var result = strategy.Backtest(backtestData, config);
             profit += result.PnL;
-            if (profit > 0)
+            if (result.PnL > 0)
             {
                 wins++;
             }
