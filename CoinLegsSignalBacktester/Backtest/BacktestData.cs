@@ -11,5 +11,6 @@ namespace CoinLegsSignalBacktester.Backtest
         public decimal LastPrice { get; set; }
         public List<decimal> Data { get; set; }
         public string FileName { get; set; }
+        public DateTime Date { get; set; }
     }
 }
