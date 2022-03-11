@@ -42,7 +42,7 @@ namespace CoinLegsSignalBacktester.Strategy
                 }
                 if(!_isTrailingActive)
                     return;
-                var sl = price + price * _trailingOffset;
+                var sl = price - price * _trailingOffset;
                 if (StopLoss < sl)
                 {
                     StopLoss = sl;
@@ -63,6 +63,7 @@ namespace CoinLegsSignalBacktester.Strategy
 
             _trailingOffset = config.GetValue<decimal>("TrailingOffset");
             _trailingStartOffset = config.GetValue<decimal>("TrailingStartOffset");
+            _isTrailingActive = false;
         }
     }
 }
