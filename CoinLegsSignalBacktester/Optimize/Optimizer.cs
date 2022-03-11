@@ -24,7 +24,10 @@ internal class Optimizer
         decimal maxProfit = 0;
         int maxWins = 0;
         BacktestConfig bestConfig;
-        Parallel.ForEach(Infinite(), _ =>
+        Parallel.ForEach(Infinite(), new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+        }, _ =>
         {
             var strategy = StrategyHelper.GetStrategyByName(config.StrategyToUse);
             if (strategy == null)
