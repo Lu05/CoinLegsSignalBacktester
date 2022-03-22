@@ -50,6 +50,9 @@ This is also really helpfull for visual debugging a strategy.
 </br>
 
 The **-d** option will backtest or optimize only for the last x days starting from the time te program will run. 
+</br>
+</br>
+The **-dir** option will backtest or optimize only the signals with the specific direction. Values are 'long', 'short', 'all'. Default is 'all'. 
 
 ### optimize
 This command will try to find the best parameters for the current strategy to maximize the profit. It will also test all the data from the folder at the config.</br>

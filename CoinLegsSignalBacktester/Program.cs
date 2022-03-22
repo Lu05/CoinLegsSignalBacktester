@@ -17,6 +17,7 @@ public class Program
         var plotOption = new Option<bool>(new[] { "-p", "--plot" }, () => false, "plot html files for each backtest");
         var daysOption = new Option<int>(new[] { "-d", "--days" }, () => int.MaxValue, "max days (now - days) uses for backtest/optimize");
         var optimizeTargetOption = new Option<string>(new[] { "-t", "--target" }, () => "profit", "target for optimization (profit, wins)");
+        var directionOption = new Option<string>(new[] { "-dir", "--direction" }, () => "all", "direction of the signals which should be taken into account(all, long, short)");
 
         var root = new RootCommand();
 
@@ -24,15 +25,16 @@ public class Program
         {
             configArg,
             plotOption,
-            daysOption
+            daysOption,
+            directionOption
         };
         root.Add(backtestCommand);
 
-        backtestCommand.SetHandler((string configPath, bool plot, int days) =>
+        backtestCommand.SetHandler((string configPath, bool plot, int days, string direction) =>
             {
-                ExecuteBacktest(configPath, plot, days);
+                ExecuteBacktest(configPath, plot, days, direction);
             }
-            , configArg, plotOption, daysOption);
+            , configArg, plotOption, daysOption, directionOption);
 
         var optimizeCommand = new Command("optimize")
         {
@@ -41,11 +43,11 @@ public class Program
             optimizeTargetOption
         };
         root.Add(optimizeCommand);
-        optimizeCommand.SetHandler((string configPath, int days, string target) =>
+        optimizeCommand.SetHandler((string configPath, int days, string target, string direction) =>
             {
-                ExecuteOptimize(configPath, days, target);
+                ExecuteOptimize(configPath, days, target, direction);
             }
-            , configArg, daysOption, optimizeTargetOption);
+            , configArg, daysOption, optimizeTargetOption, directionOption);
 
         if (args.Length == 0)
             root.Invoke("-h");
@@ -62,7 +64,7 @@ public class Program
         }
     }
 
-    private static void ExecuteOptimize(string configPath, int days, string target)
+    private static void ExecuteOptimize(string configPath, int days, string target, string direction)
     {
         var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
         if (config != null)
@@ -72,12 +74,12 @@ public class Program
             {
                 optimizeTarget = OptimizationTarget.Wins;
             }
-            var data = LoadData(config.DataPath, days);
+            var data = LoadData(config.DataPath, days, direction);
             Optimizer.Run(data, config, optimizeTarget);
         }
     }
 
-    private static IEnumerable<BacktestData> LoadData(string directory, int days)
+    private static IEnumerable<BacktestData> LoadData(string directory, int days, string direction)
     {
         var files = Directory.GetFiles(directory);
         DateTime? maxDate = null;
@@ -87,6 +89,16 @@ public class Program
         {
             var data = JsonConvert.DeserializeObject<BacktestData>(File.ReadAllText(file));
             if (data == null) continue;
+
+            if (direction != "all")
+            {
+                switch (direction)
+                {
+                    case "long" when data.Notification.Signal == -1:
+                    case "short" when data.Notification.Signal == 1:
+                        continue;
+                }
+            }
 
             var fileName = Path.GetFileNameWithoutExtension(file);
             data.FileName = fileName;
@@ -105,12 +117,12 @@ public class Program
         }
     }
 
-    private static void ExecuteBacktest(string configPath, bool plot, int days)
+    private static void ExecuteBacktest(string configPath, bool plot, int days, string direction)
     {
         var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
         if (config != null)
         {
-            var data = LoadData(config.DataPath, days);
+            var data = LoadData(config.DataPath, days, direction);
             var bt = new Backtester();
             bt.Run(data, config, plot);
         }
