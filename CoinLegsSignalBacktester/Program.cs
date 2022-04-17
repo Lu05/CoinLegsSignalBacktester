@@ -40,7 +40,8 @@ public class Program
         {
             configArg,
             daysOption,
-            optimizeTargetOption
+            optimizeTargetOption,
+            directionOption
         };
         root.Add(optimizeCommand);
         optimizeCommand.SetHandler((string configPath, int days, string target, string direction) =>
