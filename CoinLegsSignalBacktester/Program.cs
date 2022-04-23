@@ -83,6 +83,7 @@ public class Program
     private static IEnumerable<BacktestData> LoadData(string directory, int days, string direction)
     {
         var files = Directory.GetFiles(directory);
+        var result = new List<BacktestData>();
         DateTime? maxDate = null;
         if (days < int.MaxValue) maxDate = DateTime.Now.Subtract(TimeSpan.FromDays(days));
 
@@ -108,14 +109,16 @@ public class Program
             {
                 if (data.Date > maxDate)
                 {
-                    yield return data;
+                    result.Add(data);
                 }
 
                 continue;
             }
 
-            yield return data;
+            result.Add(data);
         }
+
+        return result.OrderBy(r => r.Date);
     }
 
     private static void ExecuteBacktest(string configPath, bool plot, int days, string direction)
