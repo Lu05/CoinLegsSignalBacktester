@@ -11,3 +11,4 @@ obj
 *.log
 
 /config.json
+/test

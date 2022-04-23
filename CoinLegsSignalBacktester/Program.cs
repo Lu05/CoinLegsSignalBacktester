@@ -103,7 +103,7 @@ public class Program
 
             var fileName = Path.GetFileNameWithoutExtension(file);
             data.FileName = fileName;
-            data.Date = DateTime.ParseExact(fileName.Split('_')[2], "yyyyMMddhhmmss", CultureInfo.InvariantCulture);
+            data.Date = DateTime.ParseExact(fileName.Split('_')[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
             if (maxDate != null)
             {
                 if (data.Date > maxDate)
