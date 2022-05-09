@@ -156,10 +156,20 @@ public abstract class StrategyBase
         {
             _backTestResult.ExitPrice = data.Data.Last();
             _backTestResult.State = BackTestResultState.Valid;
+            if (data.Version > 1)
+            {
+                _backTestResult.Duration = data.Times.Last() - data.Times.First();
+            }
         }
 
         if (_backTestResult.State == BackTestResultState.Valid)
+        {
             _backTestResult.PnL = GetPnL(_backTestResult.EntryPrice, _backTestResult.ExitPrice, IsShort);
+            if (data.Version > 1)
+            {
+                _backTestResult.Duration = data.Times[LastIndex] - data.Times.First();
+            }
+        }
 
         _backTestResult.MaxLoss = GetMaxDrawLoss(data.Data, IsShort, _backTestResult.EntryPrice, LastIndex);
 

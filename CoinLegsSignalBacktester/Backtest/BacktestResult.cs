@@ -8,6 +8,7 @@
         public bool StopLossHit { get; set; }
         public decimal PnL { get; set; }
         public decimal MaxLoss { get; set; }
+        public TimeSpan Duration { get; set; }
     }
 
     public enum BackTestResultState

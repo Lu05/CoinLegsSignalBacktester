@@ -30,6 +30,10 @@ namespace CoinLegsSignalBacktester.Backtest
                 if (result.State == BackTestResultState.Valid)
                 {
                     var line = $"{backtestData.Notification.MarketName} ===> profit {Math.Round(result.PnL * 100, 3)}% ===> max loss {Math.Round(result.MaxLoss * 100, 3)}%";
+                    if (backtestData.Version > 1)
+                    {
+                        line += $" ===> duration {Math.Round(result.Duration.TotalMinutes, 0)} min";
+                    }
                     if (result.PnL > 0)
                     {
                         ColorConsole.WriteProfit(line);
@@ -41,7 +45,10 @@ namespace CoinLegsSignalBacktester.Backtest
                         lossCount++;
                     }
                     profit += result.PnL;
-                    if (result.MaxLoss < maxLoss) maxLoss = result.MaxLoss;
+                    if (result.MaxLoss < maxLoss)
+                    {
+                        maxLoss = result.MaxLoss;
+                    }
                 }
                 else
                 {
