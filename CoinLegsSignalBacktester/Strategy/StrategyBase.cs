@@ -4,9 +4,9 @@ namespace CoinLegsSignalBacktester.Strategy;
 
 public abstract class StrategyBase
 {
-    private BacktestResult _backTestResult;
+    protected BacktestResult BackTestResult;
     protected bool IsPositionOpen { get; set; }
-    protected decimal EntryPrice => _backTestResult.EntryPrice;
+    protected decimal EntryPrice => BackTestResult.EntryPrice;
     public bool UseStopLoss { get; set; }
     public decimal TakeProfit { get; set; }
     public decimal StopLoss { get; set; }
@@ -27,32 +27,32 @@ public abstract class StrategyBase
             {
                 if (price <= TakeProfit)
                 {
-                    _backTestResult.ExitPrice = price;
-                    _backTestResult.State = BackTestResultState.Valid;
+                    BackTestResult.ExitPrice = price;
+                    BackTestResult.State = BackTestResultState.Valid;
                     IsPositionOpen = false;
                 }
                 else if (UseStopLoss && price >= StopLoss)
                 {
-                    _backTestResult.ExitPrice = price;
-                    _backTestResult.State = BackTestResultState.Valid;
+                    BackTestResult.ExitPrice = price;
+                    BackTestResult.State = BackTestResultState.Valid;
                     IsPositionOpen = false;
-                    _backTestResult.StopLossHit = true;
+                    BackTestResult.StopLossHit = true;
                 }
             }
             else
             {
                 if (price >= TakeProfit)
                 {
-                    _backTestResult.ExitPrice = price;
-                    _backTestResult.State = BackTestResultState.Valid;
+                    BackTestResult.ExitPrice = price;
+                    BackTestResult.State = BackTestResultState.Valid;
                     IsPositionOpen = false;
                 }
                 else if (UseStopLoss && price <= StopLoss)
                 {
-                    _backTestResult.ExitPrice = price;
-                    _backTestResult.State = BackTestResultState.Valid;
+                    BackTestResult.ExitPrice = price;
+                    BackTestResult.State = BackTestResultState.Valid;
                     IsPositionOpen = false;
-                    _backTestResult.StopLossHit = true;
+                    BackTestResult.StopLossHit = true;
                 }
             }
         }
@@ -65,7 +65,7 @@ public abstract class StrategyBase
 
         if (IsShort)
         {
-            if (price >= _backTestResult.EntryPrice)
+            if (price >= BackTestResult.EntryPrice)
             {
                 IsPositionOpen = true;
                 StartIndex = LastIndex;
@@ -73,7 +73,7 @@ public abstract class StrategyBase
         }
         else
         {
-            if (price <= _backTestResult.EntryPrice)
+            if (price <= BackTestResult.EntryPrice)
             {
                 IsPositionOpen = true;
                 StartIndex = LastIndex;
@@ -111,7 +111,7 @@ public abstract class StrategyBase
     public BacktestResult Backtest(BacktestData data, BacktestConfig config)
     {
         IsPositionOpen = false;
-        _backTestResult = new BacktestResult
+        BackTestResult = new BacktestResult
         {
             State = BackTestResultState.Invalid
         };
@@ -123,14 +123,14 @@ public abstract class StrategyBase
         SetParameters(data, config);
         if (MarketBuy)
         {
-            _backTestResult.EntryPrice = data.LastPrice;
+            BackTestResult.EntryPrice = data.LastPrice;
             IsPositionOpen = true;
             StartIndex = 0;
         }
         else
         {
             // ReSharper disable once PossibleInvalidOperationException
-            _backTestResult.EntryPrice = data.Notification.SignalPrice;
+            BackTestResult.EntryPrice = data.Notification.SignalPrice;
         }
 
         LastIndex = -1;
@@ -139,7 +139,7 @@ public abstract class StrategyBase
             LastIndex++;
             var lastPosOpen = IsPositionOpen;
             TryOpenOrExit(price);
-            if (_backTestResult.State == BackTestResultState.Valid)
+            if (BackTestResult.State == BackTestResultState.Valid)
             {
                 break;
             }
@@ -152,28 +152,33 @@ public abstract class StrategyBase
             Update(price);
         }
 
-        if (_backTestResult.State == BackTestResultState.Invalid && IsPositionOpen)
+        if (BackTestResult.State == BackTestResultState.Invalid && IsPositionOpen)
         {
-            _backTestResult.ExitPrice = data.Data.Last();
-            _backTestResult.State = BackTestResultState.Valid;
+            BackTestResult.ExitPrice = data.Data.Last();
+            BackTestResult.State = BackTestResultState.Valid;
             if (data.Version > 1)
             {
-                _backTestResult.Duration = data.Times.Last() - data.Times.First();
+                BackTestResult.Duration = data.Times.Last() - data.Times.First();
             }
         }
 
-        if (_backTestResult.State == BackTestResultState.Valid)
+        if (BackTestResult.State == BackTestResultState.Valid)
         {
-            _backTestResult.PnL = GetPnL(_backTestResult.EntryPrice, _backTestResult.ExitPrice, IsShort);
+            BackTestResult.PnL = CalculatePnL();
             if (data.Version > 1)
             {
-                _backTestResult.Duration = data.Times[LastIndex] - data.Times.First();
+                BackTestResult.Duration = data.Times[LastIndex] - data.Times.First();
             }
         }
 
-        _backTestResult.MaxLoss = GetMaxDrawLoss(data.Data, IsShort, _backTestResult.EntryPrice, LastIndex);
+        BackTestResult.MaxLoss = GetMaxDrawLoss(data.Data, IsShort, BackTestResult.EntryPrice, LastIndex);
 
-        return _backTestResult;
+        return BackTestResult;
+    }
+
+    protected virtual decimal CalculatePnL()
+    {
+        return GetPnL(BackTestResult.EntryPrice, BackTestResult.ExitPrice, IsShort);
     }
 
     private decimal GetMaxDrawLoss(List<decimal> data, bool isShort, decimal entryPrice, int lastIndex)

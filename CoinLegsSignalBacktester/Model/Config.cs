@@ -9,5 +9,7 @@ namespace CoinLegsSignalBacktester.Model
         public List<OptimizationConfig> OptimizationtConfigs { get; set; }
         public string StrategyToUse { get; set; }
         public string DataPath { get; set; }
+        public int MaxParallelPositions { get; set; }
+        public CoolDownPeriodConfig CoolDownPeriod { get; set; }
     }
 }

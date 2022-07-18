@@ -26,7 +26,7 @@ internal class Optimizer
         BacktestConfig bestConfig;
         Parallel.ForEach(Infinite(), new ParallelOptions
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            MaxDegreeOfParallelism =  Environment.ProcessorCount - 2
         }, _ =>
         {
             var strategy = StrategyHelper.GetStrategyByName(config.StrategyToUse);
@@ -53,7 +53,7 @@ internal class Optimizer
             }
 
             var backtestDataArray = data.ToArray();
-            var result = Backtest(strategy, backtestDataArray, btConfig);
+            var result = Backtest(strategy, backtestDataArray, btConfig, config);
             lock (lockObj)
             {
                 if (target == OptimizationTarget.Profit)
@@ -81,13 +81,27 @@ internal class Optimizer
         });
     }
 
-    private Tuple<decimal, int> Backtest(StrategyBase strategy, IEnumerable<BacktestData> data, BacktestConfig config)
+    private Tuple<decimal, int> Backtest(StrategyBase strategy, IEnumerable<BacktestData> data, BacktestConfig backtestConfig, Config config)
     {
         decimal profit = 0;
         int wins = 0;
+        var positionManager = new PositionManager(config.MaxParallelPositions, config.CoolDownPeriod);
         foreach (var backtestData in data)
         {
-            var result = strategy.Backtest(backtestData, config);
+            if(!positionManager.CanExecute(backtestData))
+                continue;
+            var result = strategy.Backtest(backtestData, backtestConfig);
+            if (result.State == BackTestResultState.Valid)
+            {
+                if (backtestData.Version > 1)
+                {
+                    positionManager.AddPosition(backtestData.Notification.MarketName, backtestData.Date, backtestData.Date.Add(result.Duration), result.PnL);
+                }
+                else
+                {
+                    positionManager.AddPosition(backtestData.Notification.MarketName, backtestData.Date, backtestData.Date.AddDays(1), result.PnL);
+                }
+            }
             profit += result.PnL;
             if (result.PnL > 0)
             {
@@ -97,7 +111,7 @@ internal class Optimizer
 
         return new Tuple<decimal, int>(profit, wins);
     }
-
+    
     private IEnumerable<bool> Infinite()
     {
         while (_run) yield return true;

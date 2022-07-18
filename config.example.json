@@ -1,6 +1,12 @@
 {
     "DataPath": "PATH_TO_DATA",
     "StrategyToUse": "MarketPlaceTrailingStopLossStrategy",
+    "MaxParallelPositions": 10,
+    "CoolDownPeriod": {
+        "CoolDownHours": 24,
+        "MaxDrawdown": 0.05,
+        "PositionCount": 3
+    },
     "BacktestConfigs": [
         {
             "StrategyName": "MarketPlaceFixedTakeProfitStrategy",
@@ -24,6 +30,68 @@
                 {
                     "Key": "TakeProfitIndex",
                     "Value": 5
+                },
+                {
+                    "Key": "UseStopLossFromSignal",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "StrategyName": "MarketPlacePartialTakeProfitTrailingStrategy",
+            "Parameters": [
+                {
+                    "Key": "UseStopLoss",
+                    "Value": true
+                },
+                {
+                    "Key": "StopLoss",
+                    "Value": 0.1
+                },
+                {
+                    "Key": "UseStopLossFromSignal",
+                    "Value": true
+                },
+                {
+                    "Key": "UseTrailing",
+                    "Value": true
+                },
+                {
+                    "Key": "TrailingOffset",
+                    "Value": 0.02
+                },
+                {
+                    "Key": "TakeProfit",
+                    "Value": 1.0
+                },
+                {
+                    "Key": "Profits",
+                    "Value": [
+                        {
+                            "Index": 1,
+                            "Amount": 0.001206622829336812
+                        },
+                        {
+                            "Index": 2,
+                            "Amount": 0.3265067707625199
+                        },
+                        {
+                            "Index": 3,
+                            "Amount": 0.07699093262682101
+                        },
+                        {
+                            "Index": 4,
+                            "Amount": 0.11941025449054359
+                        },
+                        {
+                            "Index": 5,
+                            "Amount": 0.47588541929077877
+                        }
+                    ]
+                },
+                {
+                    "Key": "MarketBuy",
+                    "Value": false
                 },
                 {
                     "Key": "UseStopLossFromSignal",

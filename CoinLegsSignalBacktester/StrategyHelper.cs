@@ -6,20 +6,14 @@ namespace CoinLegsSignalBacktester
     {
         public static StrategyBase GetStrategyByName(string strategyName)
         {
-            if (strategyName == "MarketPlaceFixedTakeProfitStrategy")
+            return strategyName switch
             {
-                return new MarketPlaceFixedTakeProfitStrategy();
-            }
-            if (strategyName == "BlackFishMoveTakeProfitM2Strategy")
-            {
-                return new BlackFishMoveTakeProfitM2Strategy();
-            }
-            if (strategyName == "MarketPlaceTrailingStopLossStrategy")
-            {
-                return new MarketPlaceTrailingStopLossStrategy();
-            }
-
-            return null;
+                "MarketPlaceFixedTakeProfitStrategy" => new MarketPlaceFixedTakeProfitStrategy(),
+                "BlackFishMoveTakeProfitM2Strategy" => new BlackFishMoveTakeProfitM2Strategy(),
+                "MarketPlaceTrailingStopLossStrategy" => new MarketPlaceTrailingStopLossStrategy(),
+                "MarketPlacePartialTakeProfitTrailingStrategy" => new MarketPlacePartialTakeProfitTrailingStrategy(),
+                _ => null
+            };
         }
     }
 }

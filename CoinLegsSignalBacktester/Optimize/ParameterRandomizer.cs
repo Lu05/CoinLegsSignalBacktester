@@ -1,4 +1,6 @@
-﻿namespace CoinLegsSignalBacktester.Optimize
+﻿using Newtonsoft.Json.Linq;
+
+namespace CoinLegsSignalBacktester.Optimize
 {
     internal class ParameterRandomizer
     {
@@ -6,6 +8,29 @@
 
         public object GetNextValue(OptimizationParameter parameter)
         {
+            if (parameter.Key == "Profits")
+            {
+                var values = new List<double>();
+                double total = (double)parameter.Max;
+                var array = new JArray();
+                for (int i = 0; i < 5; i++)
+                {
+                    var next = GetRandomNumber(0.0, total);
+                    if (i == 4)
+                    {
+                        next = 1 - values.Sum();
+                    }
+                    values.Add(next);
+                    total -= next;
+                    array.Add(new JObject
+                    {
+                        new JProperty("Index", i+1),
+                        new JProperty("Amount", next)
+                    });
+                }
+
+                return array;
+            }
             if (parameter.Min is double minDouble)
             {
                 var max = (double)parameter.Max;
@@ -28,6 +53,12 @@
             }
 
             throw new NotImplementedException($"type {parameter.Min.GetType()} not implemented for optimization");
+        }
+
+        private double GetRandomNumber(double minimum, double maximum)
+        { 
+            Random random = new Random();
+            return random.NextDouble() * (maximum - minimum) + minimum;
         }
     }
 }

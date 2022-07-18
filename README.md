@@ -67,6 +67,24 @@ The parameters for the config file itself are
 |:----------|:-------------|
 DataPath | absolute path to the data folder
 StrategyToUse | name of the strategy that should be used for backtesting or optimization
+MaxParallelPositions | The maximum number of parallel open trades
+CoolDownPeriod | Config for the period to pause the bot after a certain drawdown
+
+### CoolDownPeriod config
+```json
+"CoolDownPeriod": {
+    "CoolDownHours": 24,
+    "MaxDrawdown": 0.05,
+    "PositionCount": 3
+}
+```
+| Parameter|      Description| 
+|:----------|:-------------|
+CoolDownHours | Hours to pause the bot
+MaxDrawdown | drawdown which must be reached to pause the bot
+PositionCount | positions to take into account
+
+For example the above configuration will not open new positions for 24 hours if the last 3 closed positions had a drawdown higher than minus 5%.
 ## Strategies
 ### base parameters
 These are parameters which should be set for every strategy. If a parameter is not available the default value of the type will be used. Parameter types could be 
@@ -109,6 +127,46 @@ TrailingOffset | double | Offset from the current price to SL
 TrailingStartOffset | double | min profit which needs to be reached before the trailing will start
 UseStopLossFromSignal | boolean | true will use SL from the signal, false will use SL percentage value from the base parameter
 
+### MarketPlacePartialTakeProfitTrailingStrategy
+This strategy will exit the position partially on the different targets.
+Parameters are
+| Parameter|      Type| Description
+|:----------|:-------------|:-------------|
+TrailingOffset | double | Offset from the current price to SL
+TrailingStartOffset | double | min profit which needs to be reached before the trailing will start
+UseStopLossFromSignal | boolean | true will use SL from the signal, false will use SL percentage value from the base parameter
+UseTrailing | boolean | If true the rest of the amount will be used for trailing
+Prices | json array | percentage exit for each target.
+
+Here is an example of the Prices parameter.
+```json
+{
+    "Key": "Profits",
+    "Value": [
+        {
+            "Index": 1,
+            "Amount": 0.001206622829336812
+        },
+        {
+            "Index": 2,
+            "Amount": 0.3265067707625199
+        },
+        {
+            "Index": 3,
+            "Amount": 0.07699093262682101
+        },
+        {
+            "Index": 4,
+            "Amount": 0.11941025449054359
+        },
+        {
+            "Index": 5,
+            "Amount": 0.47588541929077877
+        }
+    ]
+}
+```
+If the sum of the amounts is smaller than 1 the rest of it will be used for trailing if UseTrailing is true.
 ## Optimize parameters
 Each parameter can be optimized by the optimize algorithm. There is no magic inside. It only tests random value and if the profit is better than the last one it will be printed.
 Examples can be found at the config.example.json file at the OptimizationtConfigs part.
@@ -130,6 +188,8 @@ Max | maximal value of the parameter
 In general you can optimize any parameter of the strategy but I advice you to use values which you are willing to use at live trading.
 </br> 
 You could use a SL between 0 and 100% to get awesome results but do you use 100% SL for your trades?
+
+There is a special case for the parameter 'Prices'. Here there will be generated random numbers for Target 1-5. The sum of it will be the parameters 'Max' value. So if 'Max' is 1 no trailing will be used. If 'Max' is eg 0.7 than 0.3 will be used for trailing.
 ## Implementing your own strategy
 Therefore you have to inherit from StrategyBase.
 </br> 
