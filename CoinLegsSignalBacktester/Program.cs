@@ -30,10 +30,7 @@ public class Program
         };
         root.Add(backtestCommand);
 
-        backtestCommand.SetHandler((string configPath, bool plot, int days, string direction) =>
-            {
-                ExecuteBacktest(configPath, plot, days, direction);
-            }
+        backtestCommand.SetHandler((string configPath, bool plot, int days, string direction) => { ExecuteBacktest(configPath, plot, days, direction); }
             , configArg, plotOption, daysOption, directionOption);
 
         var optimizeCommand = new Command("optimize")
@@ -44,10 +41,7 @@ public class Program
             directionOption
         };
         root.Add(optimizeCommand);
-        optimizeCommand.SetHandler((string configPath, int days, string target, string direction) =>
-            {
-                ExecuteOptimize(configPath, days, target, direction);
-            }
+        optimizeCommand.SetHandler((string configPath, int days, string target, string direction) => { ExecuteOptimize(configPath, days, target, direction); }
             , configArg, daysOption, optimizeTargetOption, directionOption);
 
         if (args.Length == 0)
@@ -75,6 +69,7 @@ public class Program
             {
                 optimizeTarget = OptimizationTarget.Wins;
             }
+
             var data = LoadData(config.DataPath, days, direction);
             Optimizer.Run(data, config, optimizeTarget);
         }
@@ -89,33 +84,41 @@ public class Program
 
         foreach (var file in files)
         {
-            var data = JsonConvert.DeserializeObject<BacktestData>(File.ReadAllText(file));
-            if (data == null) continue;
-
-            if (direction != "all")
+            try
             {
-                switch (direction)
-                {
-                    case "long" when data.Notification.Signal == -1:
-                    case "short" when data.Notification.Signal == 1:
-                        continue;
-                }
-            }
+                var data = JsonConvert.DeserializeObject<BacktestData>(File.ReadAllText(file));
+                if (data == null) continue;
 
-            var fileName = Path.GetFileNameWithoutExtension(file);
-            data.FileName = fileName;
-            data.Date = DateTime.ParseExact(fileName.Split('_')[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
-            if (maxDate != null)
-            {
-                if (data.Date > maxDate)
+                if (direction != "all")
                 {
-                    result.Add(data);
+                    switch (direction)
+                    {
+                        case "long" when data.Notification.Signal == -1:
+                        case "short" when data.Notification.Signal == 1:
+                            continue;
+                    }
                 }
 
-                continue;
-            }
+                var fileName = Path.GetFileNameWithoutExtension(file);
+                data.FileName = fileName;
+                data.Date = DateTime.ParseExact(fileName.Split('_')[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                if (maxDate != null)
+                {
+                    if (data.Date > maxDate)
+                    {
+                        result.Add(data);
+                    }
 
-            result.Add(data);
+                    continue;
+                }
+
+                result.Add(data);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Could not load {file}!");
+                throw;
+            }
         }
 
         return result.OrderBy(r => r.Date);

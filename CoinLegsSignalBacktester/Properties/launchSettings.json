@@ -1,7 +1,8 @@
 {
   "profiles": {
     "CoinLegsSignalBacktester": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "backtest -c C:\\Projects\\Custom\\CoinLegsSignalBacktester\\config.json"
     }
   }
 }
